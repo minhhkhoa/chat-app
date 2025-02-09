@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require('cors');
 require('dotenv').config();
+const router = require("./routes/index");
 
 const dataBase = require("./config/database");
 dataBase.connect();
@@ -12,6 +13,8 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(express.json());
+
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
@@ -19,7 +22,9 @@ app.get("/", (req, res) => {
     code: 200,
     message: "Success connect"
   })
-})
+});
+
+app.use("/api", router);
 
 app.listen(PORT, () => {
   console.log("server running at " + PORT);
