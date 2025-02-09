@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "provide name"]
+    required: [true, "provide name"] //-"provide name" → Đây là thông báo lỗi nếu không nhập giá trị.
   },
   email: {
     type: String,
-    required: [true, "provide email"],
+    required: [true, "provide email"], 
     unique: true
   },
   password: {
