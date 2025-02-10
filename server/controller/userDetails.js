@@ -9,7 +9,8 @@ async function userDetails(request, response) {
 
     return response.status(200).json({
       message: "user details",
-      data: user
+      data: user,
+      success: true
     });
   } catch (error) {
     return response.status(500).json({

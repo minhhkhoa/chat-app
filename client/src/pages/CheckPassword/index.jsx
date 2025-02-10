@@ -4,10 +4,13 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./style.css"; // Import file CSS
 import { checkPassword } from "../../api";
 import Notification from "../../utils/Notification";
+import { useDispatch } from "react-redux";
+import { setToken } from "../../redux/userSlice";
 
 const CheckPassWord = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   //- nếu checkEmail chưa nhập mà biết đường dẫn /password thì location?.state?.name
   //- se ko có gia tri nen se cho về trang /email
@@ -27,10 +30,14 @@ const CheckPassWord = () => {
       const result = await checkPassword(values);
 
       if (result.success) {
-        const token = result.token;
+        const token = result?.token;
+        //-luu token cua user vao redux
+        dispatch(setToken(token));
+
+        //- luu them vao storage
+        localStorage.setItem('token',token);
         Notification("success", "Thông báo", "Đăng nhập thành công!");
-        
-        // navigate("/home");
+        navigate("/");
       }
 
       if (result.error) {

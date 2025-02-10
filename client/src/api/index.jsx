@@ -52,3 +52,21 @@ export const checkPassword = async (data) => {
     console.log(error);
   }
 }
+
+export const userDetail = async () => {
+  try {
+    const res = await fetch("http://localhost:2302/api/user-details", {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', //- gửi thêm cả cookies lên server
+    });
+
+    const result = await res.json();
+
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
