@@ -1,0 +1,53 @@
+.containerEmail {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(120deg, #A8E6CF, #56AB2F);
+}
+
+.cardEmail {
+  width: 100%;
+  max-width: 24rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.iconEmail {
+  width: fit-content;
+  margin: 0 auto 0.5rem auto;
+  font-size: 2rem;
+}
+
+.titleEmail {
+  text-align: center;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.formEmail {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.inputEmail {
+  background-color: #f1f5f9;
+  padding: 0.5rem 0.5rem;
+}
+
+.buttonEmail {
+  width: 100%;
+  font-size: 1.125rem;
+}
+
+.linkEmail {
+  margin: 0.75rem 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.linkEmail a:hover {
+  color: #1677ff;
+}

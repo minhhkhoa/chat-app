@@ -61,12 +61,12 @@ const Register = () => {
       }
       const result = await register(data);
 
-      if(result.success){
+      if (result.success) {
         Notification("success", "Thông báo", "Chúc mừng bạn đã đăng ký tài khoản thành công!");
         navigate("/email");
       }
-      
-      if(result.error){
+
+      if (result.error) {
         Notification("error", "Thông báo", "Email đã tồn tại!");
       }
 
@@ -97,8 +97,6 @@ const Register = () => {
               <Input.Password placeholder="Enter your password" autoComplete="new-password" />
             </Form.Item>
           </div>
-
-          <hr style={{ display: 'flex', margin: "10px 10px" }} />
 
           <div className="blockPhoto">
             {/* Chọn ảnh đại diện */}
@@ -135,7 +133,7 @@ const Register = () => {
 
         {/* Link to Login */}
         <p style={{ textAlign: "center" }}>
-          Already have an account? <Link to="/login">Login</Link>
+          Already have an account? <Link to="/email">Login</Link>
         </p>
       </Card>
     </div>
