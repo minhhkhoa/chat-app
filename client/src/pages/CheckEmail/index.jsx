@@ -1,19 +1,33 @@
-import { useState } from "react";
 import { Card, Form, Input, Button } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UserOutlined } from "@ant-design/icons";
 import "./style.css";
+import { checkEmail } from "../../api";
+import Notification from "../../utils/Notification";
 
 const CheckEmail = () => {
+
+  const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [data, setData] = useState({ email: "" });
 
-  const handleOnChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
+  const handleSubmit = async (values) => {
+    try {
+      const result = await checkEmail(values);
 
-  const handleSubmit = (values) => {
-    console.log("Submitted email:", values.email);
+      if (result.success) {
+        //- truyền dữ liệu của user đã xác minh email sang bên checkpassword
+        //- bên đó sẽ nhận thông qua useLocation
+        navigate("/password", {
+          state: result.data
+        });
+      }
+
+      if (result.error) {
+        Notification("error", "Thông báo", "Email không tồn tại!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -47,8 +61,6 @@ const CheckEmail = () => {
               type="email"
               placeholder="Enter your email"
               className="inputEmail"
-              value={data.email}
-              onChange={handleOnChange}
             />
           </Form.Item>
 
