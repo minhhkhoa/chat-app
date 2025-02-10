@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Card, Form, Input, Button, Tabs, Image, Radio } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./style.css";
+import Notification from "../../utils/Notification";
+import { register } from "../../api";
+
 import dog from "../../assets/dog.png";
 import cat from "../../assets/cat.png";
 import chicken from "../../assets/chicken.png";
@@ -45,14 +48,34 @@ const photoGroups = {
 };
 
 const Register = () => {
+  const navigate = useNavigate()
+
   const [form] = Form.useForm();
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
-  const handleSubmit = (values) => {
-    console.log("Submitted values:", { ...values, profile_pic: selectedPhoto });
-    form.resetFields();
-    setSelectedPhoto(null);
-  };
+  const handleSubmit = async (values) => {
+    try {
+      const data = {
+        ...values,
+        profile_pic: selectedPhoto
+      }
+      const result = await register(data);
+
+      if(result.success){
+        Notification("success", "Thông báo", "Chúc mừng bạn đã đăng ký tài khoản thành công!");
+        navigate("/email");
+      }
+      
+      if(result.error){
+        Notification("error", "Thông báo", "Email đã tồn tại!");
+      }
+
+      form.resetFields();
+      setSelectedPhoto(null);
+    } catch (error) {
+      Notification("error", "Thông báo", error);
+    }
+  }
 
   return (
     <div className="pageRegister">

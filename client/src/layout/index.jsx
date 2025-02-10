@@ -15,7 +15,7 @@ const AuthLayouts = ({ children }) => {
             <img src={logo} alt="logo" width={180} height={60} />
           </header>
       }
-      
+  
       {children}
     </>
 
