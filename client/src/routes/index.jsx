@@ -5,11 +5,12 @@ import CheckEmail from "../pages/CheckEmail";
 import CheckPassWord from "../pages/CheckPassword";
 import Home from "../pages/Home";
 import Message from "../components/Message";
+import AuthLayouts from "../layout";
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App/>,
+    element: <App />,
     children: [
       {
         path: "",
@@ -17,21 +18,21 @@ const router = createBrowserRouter([
         children: [
           {
             path: ':userId',
-            element: <Message/>
+            element: <Message />
           }
         ]
       },
       {
         path: "register",
-        element: <Register/>
+        element: <AuthLayouts><Register /></AuthLayouts>
       },
       {
         path: "email",
-        element: <CheckEmail/>
+        element: <AuthLayouts><CheckEmail /></AuthLayouts>
       },
       {
         path: "password",
-        element: <CheckPassWord/>
+        element: <AuthLayouts><CheckPassWord /></AuthLayouts>
       },
     ]
   }
