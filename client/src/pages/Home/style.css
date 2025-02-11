@@ -1,0 +1,36 @@
+.layout-container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  height: 100vh;
+}
+
+.sidebar {
+  background-color: white;
+}
+
+.message-section {
+  display: none;
+}
+
+.message-section.active {
+  display: block;
+}
+
+.center-container {
+  width: calc(100% - 43vh);
+  height: 100%;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background-color: #cbd7e8;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.center-container p {
+  font-size: 1.125rem;
+  /* text-lg */
+  margin-top: 8px;
+  color: #64748b;
+}

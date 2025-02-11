@@ -4,12 +4,18 @@ import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux'
 import { logout, setUser } from '../../redux/userSlice';
 import Notification from '../../utils/Notification';
+import { Layout } from 'antd';
+import Sidebar from '../../components/Sidebar/Sidebar';
+const { Sider, Content } = Layout;
+import logo from "../../assets/logo.png";
+import "./style.css";
 
 function Home() {
   const user = useSelector(state => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const basePath = location.pathname === "/";
 
 
   const dataUser = useCallback(async () => {
@@ -37,11 +43,33 @@ function Home() {
   }, [dataUser]);
 
   return (
-    <>
-      this is page home
-      <Outlet/>
-    </>
-  )
+    <Layout className="layout-container">
+      {/* Sidebar */}
+      <Sider
+        width={300}
+        className={`sidebar ${!basePath ? "hidden" : ""}`}
+        breakpoint="lg"
+        collapsedWidth="0"
+      >
+        <Sidebar />
+      </Sider>
+
+      {/* Content */}
+      <Layout>
+        <Content className={`message-section ${basePath ? "hidden" : "active"}`}>
+          <Outlet />
+        </Content>
+
+        {/* Hiển thị logo khi ở trang chủ */}
+        {basePath && (
+          <div className="center-container">
+              <img src={logo} width={250} alt="logo" />
+              <p>Select user to send message</p>
+          </div>
+        )}
+      </Layout>
+    </Layout>
+  );
 }
 
 export default Home;

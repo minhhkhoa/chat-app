@@ -70,3 +70,21 @@ export const userDetail = async () => {
     console.log(error);
   }
 }
+
+export const logout = async () => {
+  try {
+    const res = await fetch("http://localhost:2302/api/logout", {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', //- gửi thêm cả cookies lên server
+    });
+
+    const result = await res.json();
+
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
