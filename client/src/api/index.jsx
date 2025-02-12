@@ -88,3 +88,22 @@ export const logout = async () => {
     console.log(error);
   }
 }
+
+export const searchUser = async (search) => {
+  try {
+    const res = await fetch("http://localhost:2302/api/search-user", {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(search),
+      credentials: 'include', //- gửi thêm cả cookies lên server
+    });
+
+    const result = await res.json();
+
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}

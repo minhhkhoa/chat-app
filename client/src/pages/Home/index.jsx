@@ -2,7 +2,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { userDetail } from "../../api";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux'
-import { logout, setUser } from '../../redux/userSlice';
+import { logout, setToken, setUser } from '../../redux/userSlice';
 import Notification from '../../utils/Notification';
 import { Layout } from 'antd';
 import Sidebar from '../../components/Sidebar/Sidebar';
@@ -11,6 +11,7 @@ import logo from "../../assets/logo.png";
 import "./style.css";
 
 function Home() {
+  // eslint-disable-next-line no-unused-vars
   const user = useSelector(state => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -25,22 +26,26 @@ function Home() {
       if (result.success) {
         //- lưu user vào redux khi fetch thành công
         dispatch(setUser(result.data));
+        dispatch(setToken(localStorage.getItem("token")));
       }
 
       if (result.error) {
         //- nếu nó sửa token trong cookies thì chuyển nó về trang /email bắt login lại thì sẽ làm mới được token
         Notification("error", "Thông báo", "Đừng có mà tí toáy linh tinh!");
         dispatch(logout());
+        console.log("first")
         navigate("/email");
       }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch, navigate])
+  }, [dispatch, navigate]);
+
 
   useEffect(() => {
     dataUser();
   }, [dataUser]);
+
 
   return (
     <Layout className="layout-container">

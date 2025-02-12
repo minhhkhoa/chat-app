@@ -1,17 +1,36 @@
 import { Button, Avatar, Modal } from "antd";
-import { MessageOutlined, UserAddOutlined, LogoutOutlined } from '@ant-design/icons';
+import {
+  MessageOutlined,
+  UserAddOutlined,
+  LogoutOutlined,
+} from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import "./style.css";
 import { logout } from "../../api";
 import { useNavigate } from "react-router-dom";
-import { logout as loggout} from '../../redux/userSlice';
+import { logout as loggout } from '../../redux/userSlice';
+
+export function Driver() {
+  return (
+    <>
+      <div style={{
+        padding: 0.5,
+        backgroundColor: "black",
+        margin: "4px 0",
+        width: "250px"
+      }}>
+      </div>
+    </>
+  )
+}
 
 function Sidebar() {
   const navigate = useNavigate();
   const dispatch = useDispatch()
   const user = useSelector(state => state?.user);
-  console.log(user);
+  // eslint-disable-next-line no-unused-vars
+  const [allUser, setAllUser] = useState([]);
 
   //-start modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -87,7 +106,22 @@ function Sidebar() {
         </div>
       </div>
       <div className="sidebar-right">
-        <h1>Message</h1>
+        <div className="block-top">
+          <h1 style={{ fontSize: 38, marginLeft: 20, marginTop: 20, marginBottom: 20 }}>
+            <i>Message</i>
+          </h1>
+        </div>
+        <Driver />
+        <div className="block-bottom">
+          {allUser.length === 0 && (
+            <div className="no-users">
+              <div className="icon-container">
+              </div>
+              <p className="messageSidebar">Explore users to start a conversation with.</p>
+            </div>
+          )}
+
+        </div>
       </div>
     </div>
   )
