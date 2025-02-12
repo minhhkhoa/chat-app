@@ -1,0 +1,39 @@
+.containerMessage {
+  display: flex;
+  flex-direction: column;
+}
+
+.headerMessage {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 74px;
+  background-color: white;
+  padding-left: 20px;
+}
+
+.contentMessage {
+  background-color: antiquewhite;
+  height: calc(100vh - 74px - 70px);
+  overflow-y: auto;
+  background-image: url("../../assets/background.jpeg");
+}
+
+.send-message {
+  display: flex;
+  margin-top: 20px;
+}
+
+.inputt {
+  width: 900px;
+  margin: 0 20px;
+}
+
+.control{
+  display: flex;
+  gap: 8px
+}
+
+.control:first-child {
+  margin-left: 40px;
+}

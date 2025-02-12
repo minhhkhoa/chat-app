@@ -6,7 +6,6 @@ import { logout, setToken, setUser } from '../../redux/userSlice';
 import Notification from '../../utils/Notification';
 import { Layout } from 'antd';
 import Sidebar from '../../components/Sidebar/Sidebar';
-const { Sider, Content } = Layout;
 import logo from "../../assets/logo.png";
 import "./style.css";
 
@@ -50,20 +49,18 @@ function Home() {
   return (
     <Layout className="layout-container">
       {/* Sidebar */}
-      <Sider
+      <div
         width={300}
         className={`sidebar ${!basePath ? "hidden" : ""}`}
-        breakpoint="lg"
-        collapsedWidth="0"
       >
         <Sidebar />
-      </Sider>
+      </div>
 
       {/* Content */}
       <Layout>
-        <Content className={`message-section ${basePath ? "hidden" : "active"}`}>
+        <div className={`message-section ${basePath ? "hidden" : "active"}`}>
           <Outlet />
-        </Content>
+        </div>
 
         {/* Hiển thị logo khi ở trang chủ */}
         {basePath && (

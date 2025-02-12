@@ -107,7 +107,7 @@ function Sidebar() {
       </div>
       <div className="sidebar-right">
         <div className="block-top">
-          <h1 style={{ fontSize: 38, marginLeft: 20, marginTop: 20, marginBottom: 20 }}>
+          <h1 style={{ fontSize: 38, marginLeft: 30, marginTop: 10, marginBottom: 10 }}>
             <i>Message</i>
           </h1>
         </div>
