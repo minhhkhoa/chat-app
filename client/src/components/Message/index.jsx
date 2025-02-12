@@ -87,7 +87,7 @@ function Message() {
           <Form name="sendMessage" onFinish={onFinish} style={{ maxWidth: 800 }}>
             <div className="control">
               {/* Upload file */}
-              <Upload {...uploadProps}>
+              <Upload {...uploadProps} className='uploadfile'>
                 <Button icon={<UploadOutlined />}>Chọn File</Button>
               </Upload>
 

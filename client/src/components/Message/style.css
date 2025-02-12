@@ -25,7 +25,7 @@
 }
 
 .inputt {
-  width: 900px;
+  width: 650px;
   margin: 0 20px;
 }
 
@@ -36,4 +36,7 @@
 
 .control:first-child {
   margin-left: 40px;
+}
+
+.uploadfile {
 }
