@@ -1,0 +1,8 @@
+.list:hover{
+  background-color: rgb(200, 205, 209);
+}
+
+.list {
+  transition: ease 0.2s;
+  border-radius: 8px;
+}

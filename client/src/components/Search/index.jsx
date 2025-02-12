@@ -3,8 +3,12 @@ import { Modal, Input, List, Avatar, Spin, Button } from "antd";
 import { SearchOutlined, UserAddOutlined, CloseOutlined } from "@ant-design/icons";
 import { searchUser as apisearch } from "../../api";
 import Notification from "../../utils/Notification";
+import { useNavigate } from "react-router-dom";
+import "./style.css";
 
 const SearchUser = () => {
+  const navigate = useNavigate();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchUser, setSearchUser] = useState([]);
@@ -76,11 +80,18 @@ const SearchUser = () => {
             <List
               dataSource={searchUser}
               renderItem={(user) => (
-                <List.Item>
+                <List.Item
+                  className="list"
+                  onClick={() => {
+                    navigate(`/${user._id}`);
+                    setIsModalOpen(false);
+                  }}
+                >
                   <List.Item.Meta
                     avatar={<Avatar src={user.profile_pic} />}
                     title={user.name}
                     description={user.email}
+
                   />
                 </List.Item>
               )}
