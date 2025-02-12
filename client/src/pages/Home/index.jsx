@@ -66,7 +66,6 @@ function Home() {
  
   }, [dispatch]);
 
-  console.log(user);
 
   return (
     <Layout className="layout-container">

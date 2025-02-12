@@ -1,18 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
-import { Modal, Input, List, Avatar, Spin, Button } from "antd";
+import { Modal, Input, List, Avatar, Spin, Button, Badge } from "antd";
 import { SearchOutlined, UserAddOutlined, CloseOutlined } from "@ant-design/icons";
 import { searchUser as apisearch } from "../../api";
 import Notification from "../../utils/Notification";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from 'react-redux';
 import "./style.css";
 
 const SearchUser = () => {
   const navigate = useNavigate();
+  const dataUser = useSelector(state => state?.user);
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchUser, setSearchUser] = useState([]);
   const [loading, setLoading] = useState(false);
+
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -83,15 +87,24 @@ const SearchUser = () => {
                 <List.Item
                   className="list"
                   onClick={() => {
-                    navigate(`/${user._id}`);
+                    navigate(`/${user._id}`, {
+                      state: user
+                    });
                     setIsModalOpen(false);
                   }}
                 >
                   <List.Item.Meta
-                    avatar={<Avatar src={user.profile_pic} />}
+                    avatar={
+                      <Badge
+                        dot
+                        color={dataUser.onlineUser.includes(user._id) ? "green" : "gray"} // Dấu chấm xanh nếu online, xám nếu offline
+                        offset={[-5, 40]} // Điều chỉnh vị trí dấu chấm
+                      >
+                        <Avatar src={user.profile_pic} />
+                      </Badge>
+                    }
                     title={user.name}
                     description={user.email}
-
                   />
                 </List.Item>
               )}
