@@ -2,6 +2,7 @@ const express = require('express');
 const { Server } = require('socket.io');
 const http = require('http');
 const getUserDetailsFromToken = require('../helpers/getUserDetailsFromToken');
+const UserModel = require('../models/User.model');
 
 const app = express();
 
@@ -31,6 +32,20 @@ io.on('connection', async (socket) => {
   onlineUser.add(user?._id?.toString()); //- them vao
 
   io.emit('onlineUser', Array.from(onlineUser)); //- gui nhung dua online
+
+  socket.on('message-page', async (userId) => {
+    console.log("userId: ", userId);
+    const userDetails = await UserModel.findById(userId).select("-password");
+
+    const payload = {
+      _id: userDetails?._id,
+      name: userDetails?.name,
+      email: userDetails?.email,
+      profile_pic: userDetails?.profile_pic,
+      online: onlineUser.has(userId)
+    }
+    socket.emit('message-user', payload)
+  })
 
   //-disconnect
   socket.on('disconnect', () => {

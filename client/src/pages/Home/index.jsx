@@ -2,7 +2,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { userDetail } from "../../api";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux'
-import { logout, setOnlineUser, setToken, setUser } from '../../redux/userSlice';
+import { logout, setOnlineUser, setSocketConnection, setToken, setUser } from '../../redux/userSlice';
 import Notification from '../../utils/Notification';
 import { Layout } from 'antd';
 import Sidebar from '../../components/Sidebar/Sidebar';
@@ -56,9 +56,10 @@ function Home() {
 
     //- lay ra dua onl
     socketConnect.on('onlineUser', (data) => {
-      console.log(data);
       dispatch(setOnlineUser(data));
     })
+
+    dispatch(setSocketConnection(socketConnect));
 
     return () => {
       socketConnect.disconnect();
