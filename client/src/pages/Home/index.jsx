@@ -2,11 +2,12 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { userDetail } from "../../api";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux'
-import { logout, setToken, setUser } from '../../redux/userSlice';
+import { logout, setOnlineUser, setToken, setUser } from '../../redux/userSlice';
 import Notification from '../../utils/Notification';
 import { Layout } from 'antd';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import logo from "../../assets/logo.png";
+import io from "socket.io-client";
 import "./style.css";
 
 function Home() {
@@ -45,6 +46,27 @@ function Home() {
     dataUser();
   }, [dataUser]);
 
+  //-socket connect
+  useEffect(() => {
+    const socketConnect = io('http://localhost:2302', {
+      auth: {
+        token: localStorage.getItem('token')
+      }
+    });
+
+    //- lay ra dua onl
+    socketConnect.on('onlineUser', (data) => {
+      console.log(data);
+      dispatch(setOnlineUser(data));
+    })
+
+    return () => {
+      socketConnect.disconnect();
+    }
+ 
+  }, [dispatch]);
+
+  console.log(user);
 
   return (
     <Layout className="layout-container">

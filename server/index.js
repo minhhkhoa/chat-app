@@ -3,11 +3,12 @@ const cors = require('cors');
 require('dotenv').config();
 const router = require("./routes/index");
 const cookiesParser = require('cookie-parser');
+const { app, server } = require('./socket/index');
 
 const dataBase = require("./config/database");
 dataBase.connect();
 
-const app = express();
+// const app = express();
 
 app.use(cors({
   origin: process.env.FRONTEND_URL,
@@ -28,6 +29,6 @@ app.get("/", (req, res) => {
 
 app.use("/api", router);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log("server running at " + PORT);
 })

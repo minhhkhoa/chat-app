@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Form, Avatar, Input, Upload, message } from 'antd';
 import { UploadOutlined, SendOutlined } from '@ant-design/icons';
+import { useParams } from 'react-router-dom';
 import "./style.css";
 
 function Message() {
   const user = useSelector(state => state?.user);
-  console.log(user);
+  const params = useParams();
 
   const [fileList, setFileList] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -65,6 +66,9 @@ function Message() {
     fileList,
   };
 
+  const online = user.onlineUser.includes(params.userId);
+
+
   return (
     <>
       <div className="containerMessage">
@@ -75,7 +79,9 @@ function Message() {
           </div>
           <div className="nameMessage">
             <h3>Toi la Adam</h3>
-            <p>Offline</p>
+            {
+              online ? <p style={{ color: 'green' }}>Online</p> : <p>Offline</p>
+            }
           </div>
         </div>
 
