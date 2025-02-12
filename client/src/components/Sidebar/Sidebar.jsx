@@ -1,7 +1,6 @@
 import { Button, Avatar, Modal } from "antd";
 import {
   MessageOutlined,
-  UserAddOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +9,7 @@ import "./style.css";
 import { logout } from "../../api";
 import { useNavigate } from "react-router-dom";
 import { logout as loggout } from '../../redux/userSlice';
+import SearchUser from "../Search";
 
 export function Driver() {
   return (
@@ -32,7 +32,7 @@ function Sidebar() {
   // eslint-disable-next-line no-unused-vars
   const [allUser, setAllUser] = useState([]);
 
-  //-start modal
+  //-start modal detail
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);
@@ -67,7 +67,7 @@ function Sidebar() {
       <div className="sidebar-left">
         <div className="block block-one">
           <Button icon={<MessageOutlined />}></Button>
-          <Button icon={<UserAddOutlined />}></Button>
+          <SearchUser />
         </div>
         <div className="block block-two">
 

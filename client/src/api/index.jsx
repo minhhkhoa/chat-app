@@ -92,7 +92,7 @@ export const logout = async () => {
 export const searchUser = async (search) => {
   try {
     const res = await fetch("http://localhost:2302/api/search-user", {
-      method: 'GET',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
