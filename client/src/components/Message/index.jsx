@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Button, Form, Avatar, Input, Upload, message } from "antd";
+import { Button, Form, Avatar, Input, Upload, message, Spin } from "antd";
 import { UploadOutlined, SendOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useParams, useLocation } from "react-router-dom";
 import uploadFile from "../../helpers/uploadFile";
@@ -24,16 +24,34 @@ function Message() {
   const [previewFiles, setPreviewFiles] = useState([]); // Danh sách file đã chọn
   const [messageContent, setMessageContent] = useState(""); // Nội dung tin nhắn
 
-  // Khi chọn file
-  const handleFileSelect = ({ file }) => {
+  // Khi chọn file, tải lên Cloud ngay lập tức
+  const handleFileSelect = async ({ file }) => {
     const fileType = file.type.split("/")[0]; // Lấy loại file (image, video, ...)
+
+    // Thêm file vào danh sách với trạng thái loading
     const newFile = {
       file,
-      url: URL.createObjectURL(file), // Tạo URL để preview
+      url: "", // Chưa có URL từ cloud
       type: fileType,
+      loading: true, // Đánh dấu đang tải lên
     };
 
-    setPreviewFiles((prev) => [...prev, newFile]); // Thêm vào danh sách preview
+    setPreviewFiles((prev) => [...prev, newFile]);
+
+    try {
+      // Gọi API uploadFile để tải lên Cloud
+      const uploadedFile = await uploadFile(file);
+
+      // Cập nhật danh sách, thay Spin bằng URL từ Cloud
+      setPreviewFiles((prev) =>
+        prev.map((f) => (f.file === file ? { ...f, url: uploadedFile.secure_url, loading: false } : f))
+      );
+    // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      message.error("Lỗi tải file!");
+      // Nếu lỗi, loại bỏ file đó khỏi danh sách
+      setPreviewFiles((prev) => prev.filter((f) => f.file !== file));
+    }
   };
 
   // Xóa file đã chọn
@@ -43,19 +61,8 @@ function Message() {
 
   // Gửi tin nhắn
   const onFinish = async () => {
-    const uploadedFiles = await Promise.all(
-      previewFiles.map(async (fileObj) => {
-        try {
-          const uploadedFile = await uploadFile(fileObj.file);
-          return { ...fileObj, url: uploadedFile.secure_url };
-        } catch {
-          message.error("Lỗi tải file!");
-          return null;
-        }
-      })
-    );
-
-    const successfulUploads = uploadedFiles.filter((file) => file !== null);
+    // Lấy danh sách file đã tải lên thành công
+    const successfulUploads = previewFiles.filter((file) => file.url !== "");
 
     // Gửi dữ liệu lên backend
     const formData = new FormData();
@@ -98,7 +105,9 @@ function Message() {
             <div className="previewContainer">
               {previewFiles.map((fileObj, index) => (
                 <div key={index} className="previewItem">
-                  {fileObj.type === "image" ? (
+                  {fileObj.loading ? (
+                    <Spin size="large" className="spin"/>
+                  ) : fileObj.type === "image" ? (
                     <img src={fileObj.url} alt="preview" className="image-preview" />
                   ) : (
                     <video src={fileObj.url} controls className="video-preview" />
@@ -128,7 +137,7 @@ function Message() {
               </Form.Item>
 
               <Form.Item>
-                <Button type="primary" htmlType="submit" icon={<SendOutlined />}>
+                <Button type="primary" htmlType="submit" icon={<SendOutlined />} disabled={previewFiles.some(f => f.loading)}>
                   Gửi
                 </Button>
               </Form.Item>
