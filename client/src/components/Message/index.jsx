@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+/* eslint-disable no-unused-vars */
+import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Button, Form, Avatar, Input, Upload, message, Spin } from "antd";
 import { UploadOutlined, SendOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useParams, useLocation } from "react-router-dom";
+import moment from "moment";
 import uploadFile from "../../helpers/uploadFile";
 import "./style.css";
 
@@ -12,28 +14,25 @@ function Message() {
   const online = user.onlineUser.includes(params.userId);
   const socketConnection = useSelector((state) => state?.user.socketConnection);
 
-  useEffect(() => {
-    if (socketConnection) {
-      socketConnection.emit("message-page", params.userId);
-    }
-  }, [socketConnection, params.userId]);
+  const [allMessage, setAllMessage] = useState([]); // Danh sách tất cả tin nhắn nhận được
+  const [previewFiles, setPreviewFiles] = useState([]); // Danh sách file đã chọn (để upload)
+  const [messageContent, setMessageContent] = useState(""); // Nội dung tin nhắn
 
   const location = useLocation();
   const CurrentUserInbox = location.state;
 
-  const [previewFiles, setPreviewFiles] = useState([]); // Danh sách file đã chọn
-  const [messageContent, setMessageContent] = useState(""); // Nội dung tin nhắn
+  // Ref dùng để cuộn đến tin nhắn cuối cùng
+  const messagesEndRef = useRef(null);
 
   // Khi chọn file, tải lên Cloud ngay lập tức
   const handleFileSelect = async ({ file }) => {
     const fileType = file.type.split("/")[0]; // Lấy loại file (image, video, ...)
-
     // Thêm file vào danh sách với trạng thái loading
     const newFile = {
       file,
-      url: "", // Chưa có URL từ cloud
+      url: "", // Chưa có URL từ Cloud
       type: fileType,
-      loading: true, // Đánh dấu đang tải lên
+      loading: true, // Đang tải lên
     };
 
     setPreviewFiles((prev) => [...prev, newFile]);
@@ -41,12 +40,12 @@ function Message() {
     try {
       // Gọi API uploadFile để tải lên Cloud
       const uploadedFile = await uploadFile(file);
-
       // Cập nhật danh sách, thay Spin bằng URL từ Cloud
       setPreviewFiles((prev) =>
-        prev.map((f) => (f.file === file ? { ...f, url: uploadedFile.secure_url, loading: false } : f))
+        prev.map((f) =>
+          f.file === file ? { ...f, url: uploadedFile.secure_url, loading: false } : f
+        )
       );
-    // eslint-disable-next-line no-unused-vars
     } catch (error) {
       message.error("Lỗi tải file!");
       // Nếu lỗi, loại bỏ file đó khỏi danh sách
@@ -64,20 +63,59 @@ function Message() {
     // Lấy danh sách file đã tải lên thành công
     const successfulUploads = previewFiles.filter((file) => file.url !== "");
 
-    // Gửi dữ liệu lên backend
+    // Tạo FormData để gửi dữ liệu lên backend
     const formData = new FormData();
     formData.append("senderId", user._id);
     formData.append("receiverId", params.userId);
     formData.append("message", messageContent);
-    successfulUploads.forEach((file) => formData.append("files[]", file.url));
+    successfulUploads.forEach((file) => formData.append("files", file.url));
+    const urlFile = Object.fromEntries(formData.entries()).files;
 
-    console.log("Dữ liệu gửi:", Object.fromEntries(formData.entries()));
-    message.success("Tin nhắn đã gửi!");
+    if (messageContent || urlFile) {
+      const data = {
+        sender: user._id,
+        receiver: params.userId,
+        text: messageContent,
+        urlFile: urlFile,
+        msgByUserId: user._id,
+        createdAt: new Date().toISOString(), // Nếu backend không tạo thời gian, bạn có thể thêm
+      };
+
+      if (socketConnection) {
+        socketConnection.emit("new message", data);
+      }
+    }
 
     // Reset
     setMessageContent("");
     setPreviewFiles([]);
   };
+
+  // Lắng nghe sự kiện "message" từ server và cập nhật state allMessage
+  useEffect(() => {
+    if (socketConnection) {
+      socketConnection.emit("message-page", params.userId);
+
+      const handleMessage = (data) => {
+        console.log("Received message:", data);
+        setAllMessage((prev) => [...prev, ...data]);
+      };
+
+      socketConnection.on("message", handleMessage);
+
+      return () => {
+        socketConnection.off("message", handleMessage);
+      };
+    }
+  }, [socketConnection, params.userId]);
+
+  // Cuộn xuống tin nhắn cuối cùng mỗi khi allMessage thay đổi
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView();
+    }
+  }, [allMessage]);
+
 
   return (
     <>
@@ -95,7 +133,29 @@ function Message() {
 
         {/* Nội dung tin nhắn */}
         <div className="contentMessage">
-          {/* Không cần preview giữ chỗ ở đây nữa */}
+          {allMessage.map((msg, index) => (
+            <div
+              key={index}
+              className={`message ${msg.msgByUserId === user._id ? "sent" : "received"}`}
+            >
+              {msg.text && <p className="messageText">{msg.text}</p>}
+              {msg.urlFile && msg.urlFile !== "" && (
+                msg.urlFile.includes("/video/") ? (
+                  <video src={msg.urlFile} controls className="messageVideo" />
+                ) : (
+                  <img src={msg.urlFile} alt="sent file" className="messageImage" />
+                )
+              )}
+              {/* Hiển thị thời gian gửi (dùng moment để định dạng) */}
+              {msg.createdAt && (
+                <span className="messageTime">
+                  {moment(msg.createdAt).format("h:mm A")}
+                </span>
+              )}
+            </div>
+          ))}
+          {/* Phần trống dùng để cuộn đến */}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Form gửi tin nhắn */}
@@ -106,7 +166,7 @@ function Message() {
               {previewFiles.map((fileObj, index) => (
                 <div key={index} className="previewItem">
                   {fileObj.loading ? (
-                    <Spin size="large" className="spin"/>
+                    <Spin size="large" className="spin" />
                   ) : fileObj.type === "image" ? (
                     <img src={fileObj.url} alt="preview" className="image-preview" />
                   ) : (
@@ -137,7 +197,12 @@ function Message() {
               </Form.Item>
 
               <Form.Item>
-                <Button type="primary" htmlType="submit" icon={<SendOutlined />} disabled={previewFiles.some(f => f.loading)}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  icon={<SendOutlined />}
+                  disabled={previewFiles.some((f) => f.loading)}
+                >
                   Gửi
                 </Button>
               </Form.Item>

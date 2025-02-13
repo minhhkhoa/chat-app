@@ -25,7 +25,6 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  opacity: 50%;
 }
 
 .send-message {
@@ -42,6 +41,59 @@
 }
 .inputMSG{
   width: 700px;
+}
+
+/* Mỗi tin nhắn */
+.message {
+  max-width: 100%;
+  padding: 8px 12px;
+  border-radius: 20px;
+  margin-bottom: 5px;
+  word-break: break-word;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tin nhắn gửi đi */
+.message.sent {
+  align-self: flex-end;
+  background-color: #dcf8c6;
+  text-align: right;
+}
+
+/* Tin nhắn nhận được */
+.message.received {
+  align-self: flex-start;
+  background-color: #ed9393;
+  text-align: left;
+}
+
+/* Style cho văn bản tin nhắn */
+.messageText {
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Style cho hình ảnh tin nhắn */
+.messageImage,
+.messageVideo {
+  max-width: 100%;
+  width: 200px;
+  height: 300px;
+  margin-top: 5px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* Thời gian gửi tin nhắn */
+.messageTime {
+  font-size: 10px;
+  color: #666;
+  margin-top: 4px;
+  align-self: flex-end;
+  /* Hiển thị bên dưới, căn phải */
 }
 
 
