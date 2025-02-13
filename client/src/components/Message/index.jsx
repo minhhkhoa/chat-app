@@ -1,73 +1,75 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Button, Form, Avatar, Input, Upload, message } from 'antd';
-import { UploadOutlined, SendOutlined } from '@ant-design/icons';
-import { useParams, useLocation } from 'react-router-dom';
-import uploadFile from '../../helpers/uploadFile'; // Import hàm upload lên Cloudinary
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Button, Form, Avatar, Input, Upload, message } from "antd";
+import { UploadOutlined, SendOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { useParams, useLocation } from "react-router-dom";
+import uploadFile from "../../helpers/uploadFile";
 import "./style.css";
 
 function Message() {
-  const user = useSelector(state => state?.user);
+  const user = useSelector((state) => state?.user);
   const params = useParams();
   const online = user.onlineUser.includes(params.userId);
-  const socketConnection = useSelector(state => state?.user.socketConnection);
+  const socketConnection = useSelector((state) => state?.user.socketConnection);
 
   useEffect(() => {
     if (socketConnection) {
-      socketConnection.emit('message-page', params.userId);
+      socketConnection.emit("message-page", params.userId);
     }
   }, [socketConnection, params.userId]);
 
   const location = useLocation();
   const CurrentUserInbox = location.state;
 
-  const [fileList, setFileList] = useState([]);
-  const [uploading, setUploading] = useState(false);
+  const [previewFiles, setPreviewFiles] = useState([]); // Danh sách file đã chọn
+  const [messageContent, setMessageContent] = useState(""); // Nội dung tin nhắn
 
-  // Hàm gửi tin nhắn
-  const onFinish = async (values) => {
-    setUploading(true);
+  // Khi chọn file
+  const handleFileSelect = ({ file }) => {
+    const fileType = file.type.split("/")[0]; // Lấy loại file (image, video, ...)
+    const newFile = {
+      file,
+      url: URL.createObjectURL(file), // Tạo URL để preview
+      type: fileType,
+    };
 
-    try {
-      let uploadedFileUrls = [];
-
-      // Nếu có file -> Upload lên Cloudinary
-      if (fileList.length > 0) {
-        const uploadPromises = fileList.map(file => uploadFile(file)); // Sử dụng trực tiếp file
-        const uploadedFiles = await Promise.all(uploadPromises);
-        uploadedFileUrls = uploadedFiles.map(file => file.secure_url);
-      }
-
-      // Chuẩn bị dữ liệu gửi về backend
-      const formData = new FormData();
-      formData.append("senderId", user._id);
-      formData.append("receiverId", params.userId);
-      formData.append("message", values["content-send"] || "");
-      uploadedFileUrls.forEach(url => formData.append("files[]", url));
-
-      console.log("Dữ liệu gửi đi:", Object.fromEntries(formData.entries()));
-
-    } catch (error) {
-      console.error("Lỗi khi gửi tin nhắn:", error);
-      message.error("Đã xảy ra lỗi khi gửi tin nhắn.");
-    } finally {
-      setUploading(false);
-    }
+    setPreviewFiles((prev) => [...prev, newFile]); // Thêm vào danh sách preview
   };
 
+  // Xóa file đã chọn
+  const handleRemoveFile = (index) => {
+    setPreviewFiles((prev) => prev.filter((_, i) => i !== index));
+  };
 
+  // Gửi tin nhắn
+  const onFinish = async () => {
+    const uploadedFiles = await Promise.all(
+      previewFiles.map(async (fileObj) => {
+        try {
+          const uploadedFile = await uploadFile(fileObj.file);
+          return { ...fileObj, url: uploadedFile.secure_url };
+        } catch {
+          message.error("Lỗi tải file!");
+          return null;
+        }
+      })
+    );
 
+    const successfulUploads = uploadedFiles.filter((file) => file !== null);
 
-  // Props của Upload
-  const uploadProps = {
-    onRemove: (file) => {
-      setFileList(fileList.filter(item => item.uid !== file.uid));
-    },
-    beforeUpload: (file) => {
-      setFileList([...fileList, file]);
-      return false;
-    },
-    fileList,
+    // Gửi dữ liệu lên backend
+    const formData = new FormData();
+    formData.append("senderId", user._id);
+    formData.append("receiverId", params.userId);
+    formData.append("message", messageContent);
+    successfulUploads.forEach((file) => formData.append("files[]", file.url));
+
+    console.log("Dữ liệu gửi:", Object.fromEntries(formData.entries()));
+    message.success("Tin nhắn đã gửi!");
+
+    // Reset
+    setMessageContent("");
+    setPreviewFiles([]);
   };
 
   return (
@@ -80,36 +82,54 @@ function Message() {
           </div>
           <div className="nameMessage">
             <h3>{CurrentUserInbox?.name}</h3>
-            {online ? <p style={{ color: 'green' }}>Online</p> : <p>Offline</p>}
+            {online ? <p style={{ color: "green" }}>Online</p> : <p>Offline</p>}
           </div>
         </div>
 
         {/* Nội dung tin nhắn */}
-        <div className="contentMessage"></div>
+        <div className="contentMessage">
+          {/* Không cần preview giữ chỗ ở đây nữa */}
+        </div>
 
         {/* Form gửi tin nhắn */}
         <div className="send-message">
-          <Form name="sendMessage" onFinish={onFinish} style={{ maxWidth: 800 }}>
+          <Form onFinish={onFinish} style={{ maxWidth: 800 }}>
+            {/* Hiển thị Preview file đã chọn */}
+            <div className="previewContainer">
+              {previewFiles.map((fileObj, index) => (
+                <div key={index} className="previewItem">
+                  {fileObj.type === "image" ? (
+                    <img src={fileObj.url} alt="preview" className="image-preview" />
+                  ) : (
+                    <video src={fileObj.url} controls className="video-preview" />
+                  )}
+                  <Button
+                    type="text"
+                    icon={<CloseCircleOutlined />}
+                    className="removeFileBtn"
+                    onClick={() => handleRemoveFile(index)}
+                  />
+                </div>
+              ))}
+            </div>
+
             <div className="control">
-              {/* Upload file */}
-              <Upload {...uploadProps} className='uploadfile'>
+              <Upload beforeUpload={() => false} onChange={handleFileSelect} showUploadList={false}>
                 <Button icon={<UploadOutlined />}>Chọn File</Button>
               </Upload>
 
-              {/* Input nhập tin nhắn */}
-              <Form.Item name="content-send">
-                <Input className='inputt' placeholder="Nhập tin nhắn..." />
+              <Form.Item>
+                <Input
+                  value={messageContent}
+                  onChange={(e) => setMessageContent(e.target.value)}
+                  placeholder="Nhập tin nhắn..."
+                  className="inputMSG"
+                />
               </Form.Item>
 
-              {/* Nút gửi tin nhắn */}
-              <Form.Item label={null}>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={uploading}
-                  icon={<SendOutlined />}
-                >
-                  {uploading ? 'Đang gửi...' : 'Gửi'}
+              <Form.Item>
+                <Button type="primary" htmlType="submit" icon={<SendOutlined />}>
+                  Gửi
                 </Button>
               </Form.Item>
             </div>
