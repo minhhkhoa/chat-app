@@ -106,11 +106,21 @@ io.on('connection', async (socket) => {
     io.to(data?.receiver).emit('message', getConversationMessage?.messages || []);
 
     // //send conversation
-    // const conversationSender = await getConversation(data?.sender);
-    // const conversationReceiver = await getConversation(data?.receiver);
+    const conversationSender = await getConversation(data?.sender);
+    const conversationReceiver = await getConversation(data?.receiver);
 
-    // io.to(data?.sender).emit('conversation', conversationSender);
-    // io.to(data?.receiver).emit('conversation', conversationReceiver);
+    io.to(data?.sender).emit('conversation', conversationSender);
+    io.to(data?.receiver).emit('conversation', conversationReceiver);
+  });
+
+  //sidebar
+  socket.on('sidebar', async (currentUserId) => {
+    console.log("current user", currentUserId)
+
+    const conversation = await getConversation(currentUserId)
+
+    socket.emit('conversation', conversation)
+
   })
 
   //-disconnect

@@ -97,7 +97,6 @@ function Message() {
       socketConnection.emit("message-page", params.userId);
 
       const handleMessage = (data) => {
-        console.log("Received message:", data);
         setAllMessage((prev) => [...prev, ...data]);
       };
 
