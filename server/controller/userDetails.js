@@ -7,11 +7,18 @@ async function userDetails(request, response) {
 
     const user = await getUserDetailsFromToken(token);
 
-    return response.status(200).json({
-      message: "user details",
-      data: user,
-      success: true
-    });
+    if (user) {
+      return response.status(200).json({
+        message: "user details",
+        data: user,
+        success: true
+      });
+    } else{
+      return response.status(500).json({
+        message: error.message || error,
+        error: true
+      })
+    }
   } catch (error) {
     return response.status(500).json({
       message: error.message || error,

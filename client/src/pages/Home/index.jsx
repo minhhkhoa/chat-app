@@ -23,6 +23,11 @@ function Home() {
     try {
       const result = await userDetail();
 
+      if (result.data.logout){
+        navigate("/email");
+
+      }
+
       if (result.success) {
         //- lưu user vào redux khi fetch thành công
         dispatch(setUser(result.data));
@@ -33,7 +38,7 @@ function Home() {
         //- nếu nó sửa token trong cookies thì chuyển nó về trang /email bắt login lại thì sẽ làm mới được token
         Notification("error", "Thông báo", "Đừng có mà tí toáy linh tinh!");
         dispatch(logout());
-        console.log("first")
+        console.log("first");
         navigate("/email");
       }
     } catch (error) {

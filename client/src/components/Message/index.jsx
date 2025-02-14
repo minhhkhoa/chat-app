@@ -14,14 +14,14 @@ function Message() {
   const online = user.onlineUser.includes(params.userId);
   const socketConnection = useSelector((state) => state?.user.socketConnection);
 
-  const [allMessage, setAllMessage] = useState([]); // Danh sách tất cả tin nhắn nhận được
+  const [allMessage, setAllMessage] = useState([]); // Danh sách tin nhắn
   const [previewFiles, setPreviewFiles] = useState([]); // Danh sách file đã chọn (để upload)
   const [messageContent, setMessageContent] = useState(""); // Nội dung tin nhắn
 
   const location = useLocation();
   const CurrentUserInbox = location.state;
 
-  // Ref dùng để cuộn đến tin nhắn cuối cùng
+  // Ref dùng để cuộn xuống tin nhắn cuối cùng
   const messagesEndRef = useRef(null);
 
   // Khi chọn file, tải lên Cloud ngay lập tức
@@ -78,7 +78,7 @@ function Message() {
         text: messageContent,
         urlFile: urlFile,
         msgByUserId: user._id,
-        createdAt: new Date().toISOString(), // Nếu backend không tạo thời gian, bạn có thể thêm
+        createdAt: new Date().toISOString(),
       };
 
       if (socketConnection) {
@@ -86,18 +86,22 @@ function Message() {
       }
     }
 
-    // Reset
+    // Reset tin nhắn và file preview
     setMessageContent("");
     setPreviewFiles([]);
   };
 
-  // Lắng nghe sự kiện "message" từ server và cập nhật state allMessage
+  // Lắng nghe sự kiện "message" từ server khi userId thay đổi
   useEffect(() => {
     if (socketConnection) {
+      // Reset lại danh sách tin nhắn cũ khi chuyển chat
+      setAllMessage([]);
+      // Yêu cầu load tin nhắn cho userId mới
       socketConnection.emit("message-page", params.userId);
 
       const handleMessage = (data) => {
-        setAllMessage((prev) => [...prev, ...data]);
+        // Nếu backend trả về toàn bộ danh sách tin nhắn, set luôn state
+        setAllMessage(data);
       };
 
       socketConnection.on("message", handleMessage);
@@ -108,13 +112,12 @@ function Message() {
     }
   }, [socketConnection, params.userId]);
 
-  // Cuộn xuống tin nhắn cuối cùng mỗi khi allMessage thay đổi
+  // Cuộn xuống tin nhắn cuối cùng mỗi khi danh sách tin nhắn thay đổi
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView();
     }
   }, [allMessage]);
-
 
   return (
     <>
@@ -145,7 +148,6 @@ function Message() {
                   <img src={msg.urlFile} alt="sent file" className="messageImage" />
                 )
               )}
-              {/* Hiển thị thời gian gửi (dùng moment để định dạng) */}
               {msg.createdAt && (
                 <span className="messageTime">
                   {moment(msg.createdAt).format("h:mm A")}
@@ -214,3 +216,5 @@ function Message() {
 }
 
 export default Message;
+
+//-nn

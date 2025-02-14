@@ -4,9 +4,10 @@ import Register from "../pages/Register";
 import CheckEmail from "../pages/CheckEmail";
 import CheckPassWord from "../pages/CheckPassword";
 import Home from "../pages/Home";
-import Message from "../components/Message";
+// import Message from "../components/Message";
 import AuthLayouts from "../layout";
 import ForgotPassword from "../pages/Forgotpassword";
+import MessageWrapper from "../components/MessageWapper";
 
 const router = createBrowserRouter([
   {
@@ -19,7 +20,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: ':userId',
-            element: <Message />
+            element: <MessageWrapper/>
           }
         ]
       },

@@ -4,19 +4,17 @@ import { SearchOutlined, UserAddOutlined, CloseOutlined } from "@ant-design/icon
 import { searchUser as apisearch } from "../../api";
 import Notification from "../../utils/Notification";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import "./style.css";
 
 const SearchUser = () => {
   const navigate = useNavigate();
   const dataUser = useSelector(state => state?.user);
 
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchUser, setSearchUser] = useState([]);
   const [loading, setLoading] = useState(false);
-
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -43,11 +41,11 @@ const SearchUser = () => {
       }
     } catch (error) {
       Notification('warning', "Thông báo", "Không tìm thấy người dùng");
-      console.log(error)
+      console.log(error);
     } finally {
       setLoading(false);
     }
-  }, [search])
+  }, [search]);
 
   useEffect(() => {
     if (search) {
@@ -58,6 +56,7 @@ const SearchUser = () => {
   return (
     <>
       <Button onClick={showModal} icon={<UserAddOutlined />}>
+        {/* Bạn có thể thêm text nếu cần */}
       </Button>
 
       <Modal
@@ -67,7 +66,6 @@ const SearchUser = () => {
         footer={null}
         closeIcon={<CloseOutlined />}
       >
-        {/* Input tìm kiếm */}
         <Input
           placeholder="Nhập tên hoặc email..."
           prefix={<SearchOutlined />}
@@ -76,10 +74,12 @@ const SearchUser = () => {
           allowClear
         />
 
-        {/* Danh sách kết quả */}
         <div style={{ marginTop: 10, maxHeight: 300, overflowY: "auto" }}>
           {loading ? (
-            <Spin tip="Đang tìm kiếm..." style={{ display: "flex", justifyContent: "center", marginTop: 20 }} />
+            <Spin
+              tip="Đang tìm kiếm..."
+              style={{ display: "flex", justifyContent: "center", marginTop: 20 }}
+            />
           ) : searchUser.length > 0 ? (
             <List
               dataSource={searchUser}
@@ -87,9 +87,8 @@ const SearchUser = () => {
                 <List.Item
                   className="list"
                   onClick={() => {
-                    navigate(`/${user._id}`, {
-                      state: user
-                    });
+                    // Sử dụng template literal để chuyển hướng chính xác
+                    navigate(`/${user._id}`, { state: user });
                     setIsModalOpen(false);
                   }}
                 >
@@ -97,8 +96,8 @@ const SearchUser = () => {
                     avatar={
                       <Badge
                         dot
-                        color={dataUser.onlineUser.includes(user._id) ? "green" : "gray"} // Dấu chấm xanh nếu online, xám nếu offline
-                        offset={[-5, 40]} // Điều chỉnh vị trí dấu chấm
+                        color={dataUser.onlineUser.includes(user._id) ? "green" : "gray"}
+                        offset={[-5, 40]}
                       >
                         <Avatar src={user.profile_pic} />
                       </Badge>
@@ -110,7 +109,9 @@ const SearchUser = () => {
               )}
             />
           ) : (
-            <p style={{ textAlign: "center", color: "#999", marginTop: 10 }}>Không tìm thấy người dùng!</p>
+            <p style={{ textAlign: "center", color: "#999", marginTop: 10 }}>
+              Không tìm thấy người dùng!
+            </p>
           )}
         </div>
       </Modal>
@@ -119,3 +120,6 @@ const SearchUser = () => {
 };
 
 export default SearchUser;
+
+
+//-n

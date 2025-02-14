@@ -98,6 +98,8 @@ function Sidebar() {
     navigate(`/${userDetails._id}`, { state: userDetails });
   };
 
+  console.log(allUser);
+
   // console.log(allUser);
 
   return (
@@ -160,13 +162,12 @@ function Sidebar() {
                   onClick={() => handleConversationClick(conversation.userDetails)}
                 >
                   <Avatar size={40} src={conversation.userDetails?.profile_pic} />
+                 
                   <div className="conversationInfo">
                     <p className="conversationName">{conversation.userDetails?.name}</p>
-                    {conversation.messages && conversation.messages.length > 0 && (
-                      <p className="conversationLastMessage">
-                        {conversation.messages[conversation.messages.length - 1].text || "File"}
-                      </p>
-                    )}
+                    <p className="conversationLastMessage">
+                      {conversation.lastMsg.text}
+                    </p>
                   </div>
                 </div>
               ))}

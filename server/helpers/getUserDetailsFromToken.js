@@ -3,7 +3,7 @@ const UserModel = require('../models/User.model');
 
 const getUserDetailsFromToken = async (token) => {
 
-  if (!token) {
+  if (!token || token==="") {
     return {
       message: "session out",
       logout: true,
